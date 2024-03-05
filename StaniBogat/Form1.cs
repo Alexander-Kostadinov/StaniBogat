@@ -15,14 +15,16 @@ namespace StaniBogat
         public int Y;
         public int Time;
         public int Count;
+        public Form Form;
+        public bool LoadGif;
         public bool IsStarted;
         public bool IsUsedBtn1;
         public bool IsUsedBtn2;
         public string TimeText;
         public Bitmap BackScene;
-        public bool IsTimeRunnig;
         public ElementHost Element;
         public TextBlock AnimationText;
+        public System.Windows.Forms.TextBox PlayerName;
 
         public Form1()
         {
@@ -30,14 +32,16 @@ namespace StaniBogat
 
             Count = 1;
             Time = 120;
+            LoadGif = false;
+            Form = new Form();
             IsStarted = false;
             TimeText = "02:00";
             IsUsedBtn1 = false;
             IsUsedBtn2 = false;
-            IsTimeRunnig = false;
             timer1.Interval = 1000;
             Element = new ElementHost();
             AnimationText = new TextBlock();
+            PlayerName = new System.Windows.Forms.TextBox();
 
             var directory = Path.GetDirectoryName(Environment.CurrentDirectory);
             var path = directory.Replace("bin", "") + "Studio.bmp";
@@ -46,41 +50,45 @@ namespace StaniBogat
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.Width = (int)(Screen.PrimaryScreen.Bounds.Width / 1.25);
-            this.Height = (int)(Screen.PrimaryScreen.Bounds.Height / 1.25);
+            this.Width = (int)(Screen.PrimaryScreen.Bounds.Width / 1.20);
+            this.Height = (int)(Screen.PrimaryScreen.Bounds.Height / 1.20);
 
             for (int i = 0; i < Controls.Count; i++)
             {
+                if (Controls[i] == button1)
+                {
+                    continue;
+                }
+
                 Controls[i].Visible = false;
             }
 
-            //ElementHost elementHost = new ElementHost();
-            //elementHost.Width = this.Width;
-            //elementHost.Height = this.Height;
-            //elementHost.Location = new System.Drawing.Point(0, 0);
+            var animation = new DoubleAnimation
+            {
+                From = 0.0,
+                To = 1.0,
+                Duration = TimeSpan.FromSeconds(2),
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever,
+            };
 
-            //var directory = Path.GetDirectoryName(Environment.CurrentDirectory);
-            //var path = directory.Replace("bin", "") + "logo.gif";
-            //MediaElement gif = new MediaElement();
-            //gif.LoadedBehavior = MediaState.Manual;
-            //gif.UnloadedBehavior = MediaState.Manual;
+            Element.Dock = DockStyle.Top;
+            Element.Child = AnimationText;
+            Element.Width = this.Width / 2;
+            Element.Height = this.Height / 2;
 
-            //if (File.Exists(path))
-            //{
-            //    gif.Source = new Uri(path);
-            //    elementHost.Child = gif;
-            //    Controls.Add(elementHost);
-            //    gif.Play();
+            AnimationText.FontSize = 42;
+            AnimationText.FontStyle = FontStyles.Italic;
+            AnimationText.TextAlignment = TextAlignment.Center;
+            AnimationText.VerticalAlignment = VerticalAlignment.Center;
+            AnimationText.Text = "Press the button to start the game !";
+            AnimationText.Foreground = System.Windows.Media.Brushes.LightGoldenrodYellow;
+            AnimationText.BeginAnimation(UIElement.OpacityProperty, animation);
 
-            //    gif.MediaEnded += (s, ev) =>
-            //    {
-            //        gif.Close();
-            //        gif = null;
-            //        elementHost.Dispose();
-            //        Controls.Remove(elementHost);
-            //        elementHost = null;
-            //    };
-            //}
+            button1.Location = new System.Drawing.Point((Width -
+                button1.Width) / 2, (Height - button1.Height) / 2);
+
+            Controls.Add(Element);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -135,38 +143,38 @@ namespace StaniBogat
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            if (IsStarted == false)
+            if (LoadGif == true)
             {
-                button1.Visible = true;
+                Element.Width = Width;
+                Element.Height = Height;
+                Element.Dock = DockStyle.None;
+                Element.Location = new System.Drawing.Point(0, 0);
 
-                //var animation = new DoubleAnimation
-                //{
-                //    From = 0.0,
-                //    To = 1.0,
-                //    Duration = TimeSpan.FromSeconds(2),
-                //    AutoReverse = true,
-                //    RepeatBehavior = RepeatBehavior.Forever,
-                //};
+                var directory = Path.GetDirectoryName(Environment.CurrentDirectory);
+                var path = directory.Replace("bin", "") + "logo.gif";
+                MediaElement gif = new MediaElement();
+                gif.LoadedBehavior = MediaState.Manual;
+                gif.UnloadedBehavior = MediaState.Manual;
 
-                //Element.Dock = DockStyle.Top;
-                //Element.Child = AnimationText;
-                //Element.Width = this.Width / 2;
-                //Element.Height = this.Height / 2;
+                if (File.Exists(path))
+                {
+                    Element.Child = gif;
+                    Controls.Add(Element);
+                    gif.Source = new Uri(path);
+                    gif.MediaEnded += (s, ev) =>
+                    {
+                        gif.Close();
+                        gif = null;
+                        Element.Dispose();
+                        Controls.Remove(Element);
+                        Form.Show();
+                    };
+                    gif.Play();
+                }
 
-                //AnimationText.FontSize = 42;
-                //AnimationText.FontStyle = FontStyles.Italic;
-                //AnimationText.TextAlignment = TextAlignment.Center;
-                //AnimationText.VerticalAlignment = VerticalAlignment.Center;
-                //AnimationText.Text = "Press the button to start the game !";
-                //AnimationText.Foreground = System.Windows.Media.Brushes.LightGoldenrodYellow;
-                //AnimationText.BeginAnimation(UIElement.OpacityProperty, animation);
-
-                //button1.Location = new System.Drawing.Point((Width -
-                //    button1.Width) / 2, (Height - button1.Height) / 2);
-
-                //Controls.Add(Element);
+                LoadGif = false;
             }
-            if (IsStarted == true)
+            else if (IsStarted == true)
             {
                 Pen pen = new Pen(Color.DarkBlue, 8);
                 Brush brush = new SolidBrush(Color.Black);
@@ -194,23 +202,65 @@ namespace StaniBogat
 
         private void button1_Click(object sender, EventArgs e)
         {
+            AnimationText = null;
+            Controls.Remove(button1);
+            Controls.Remove(Element);
+
+            Form.Size = new System.Drawing.Size(550, 375);
+            Form.Controls.Add(PlayerName);
+            PlayerName.Font = new Font("Italic", 14);
+            PlayerName.Width = Form.Width / 2;
+            Form.StartPosition = FormStartPosition.CenterScreen;
+            PlayerName.Location = new System.Drawing.Point((Form.Width
+                - PlayerName.Width) / 2, (Form.Height - PlayerName.Height) / 2 - 25);
+
+            System.Windows.Forms.Button button = new System.Windows.Forms.Button();
+            Form.Controls.Add(button);
+            button.Click += Button_Click;
+            button.Size = new System.Drawing.Size(200, 75);
+            button.Font = new Font("Arial", 20);
+            button.Text = "Start";
+            button.Location = new System.Drawing.Point((Form.Width
+                - button.Width) / 2, PlayerName.Location.Y + PlayerName.Height + 20);
+
+            var label = new System.Windows.Forms.Label();
+            Form.Controls.Add(label);
+            label.AutoSize = true;
+            label.Font = new Font("Italic", 24);
+            label.Text = "Please, enter player name!";
+            label.Location = new System.Drawing.Point((Form.Width - label.Width) / 2, 80);
+
+            LoadGif = true;
+            Refresh();
+        }
+
+        private void Button_Click(object sender, EventArgs e)
+        {
+            if (PlayerName.Text == "")
+            {
+                System.Windows.MessageBox.Show(
+                    "Please enter player name before start the game!");
+                return;
+            }
+
+            Form.Close();
+            Form.Dispose();
             timer1.Start();
             IsStarted = true;
-            Element.Dispose();
             Controls.Remove(Element);
             Controls.Remove(button1);
-            Y = 125;
+            Y = Height / 7;
 
             for (int i = 0; i < Controls.Count; i++)
             {
                 if (Controls[i].GetType() == typeof(System.Windows.Forms.Label))
                 {
                     Controls[i].ForeColor = Color.White;
-                    Controls[i].Font = new Font("Arial", 24);
+                    Controls[i].Font = new Font("Arial", Height / 36);
                     Controls[i].BackColor = Color.Transparent;
                     Controls[i].Location = new System.Drawing.Point(
                         Width - (Controls[i].Width + 50), Y);
-                    Y += Controls[i].Height + 15;
+                    Y += Controls[i].Height + Height / 57;
                 }
 
                 Controls[i].Visible = true;
@@ -222,27 +272,28 @@ namespace StaniBogat
 
             button4.ForeColor = Color.White;
             button4.BackColor = Color.DarkBlue;
-            button4.Font = new Font("Arial", 20);
-            button4.Location = new System.Drawing.Point(label10.Location.X + 10, 20);
+            button4.Font = new Font("Arial", Height / 43);
+            button4.Location = new System.Drawing.Point(label10.Location.X + 10, Height / 43);
 
             button3.Text = "Bonus\nTime";
             button3.ForeColor = Color.White;
             button3.BackColor = Color.DarkBlue;
-            button3.Font = new Font("Arial", 20);
+            button3.Font = new Font("Arial", Height / 43);
             button3.Location = new System.Drawing.Point(
-                button4.Location.X + button4.Width + 25, 20);
+                button4.Location.X + button4.Width + 25, Height / 43);
             button4.Size = button3.Size;
 
             button2.ForeColor = Color.Black;
-            button2.Font = new Font("Italic", 20);
+            button2.Font = new Font("Italic", Height / 43);
             button2.BackColor = Color.DarkGoldenrod;
-            button2.Height += 10;
-            button2.Location = new System.Drawing.Point(X - 10, Y + 30 + label1.Height);
+            button2.Height += Height / 86;
+            button2.Location = new System.Drawing.Point(X + (label1.Width - button2.Width) / 2,
+                label1.Location.Y + label1.Height + Height / 59);
 
             button5.Text = "Best\nplayers";
             button5.ForeColor = Color.White;
             button5.BackColor = Color.Black;
-            button5.Font = new Font("Arial", 16);
+            button5.Font = new Font("Arial", Height / 54);
             button5.Width += 5;
             button5.Height += 15;
             button5.Location = new System.Drawing.Point(10, 10);
