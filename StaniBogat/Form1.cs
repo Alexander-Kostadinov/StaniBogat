@@ -72,10 +72,10 @@ namespace StaniBogat
                 RepeatBehavior = RepeatBehavior.Forever,
             };
 
-            Element.Dock = DockStyle.Top;
-            Element.Child = AnimationText;
-            Element.Width = this.Width / 2;
             Element.Height = this.Height / 2;
+            Element.Width = this.Width / 2;
+            Element.Child = AnimationText;
+            Element.Dock = DockStyle.Top;
 
             AnimationText.FontSize = 42;
             AnimationText.FontStyle = FontStyles.Italic;
@@ -186,14 +186,21 @@ namespace StaniBogat
                 e.Graphics.FillRectangle(brush, label10.Location.X 
                     - 20, 4, Width - label10.Location.X - 2, Height - 55);
                 e.Graphics.DrawEllipse(pen, ((label10.Location.X - 20)
-                    / 2) - (TimeText.Length * 30) / 2 - 25, 10, 200, 100);
+                    / 2) - TimeText.Length * (Height / 30) / 2 - (Height / 35),
+                    10, (int)(Height / 4.3), (int)(Height / 8.6));
                 e.Graphics.FillEllipse(brush, ((label10.Location.X - 20) 
-                    / 2) - (TimeText.Length * 30) / 2 - 25, 10, 200, 100);
+                    / 2) - TimeText.Length * (Height / 30) / 2 - (Height / 35),
+                    10, (int)(Height / 4.3), (int)(Height / 8.6));
                 brush = new SolidBrush(Color.White);
-                e.Graphics.DrawString(TimeText, new Font("Arial", 32),
-                    brush, new PointF(((label10.Location.X - 20) / 2) - (TimeText.Length * 30) / 2, 25));
+                e.Graphics.DrawString(TimeText, new Font("Arial", Height / 27),
+                    brush, new PointF(((label10.Location.X - 20) / 2) - TimeText.Length * (Height / 29) / 2, 25));
                 brush = new SolidBrush(Color.DarkGoldenrod);
                 e.Graphics.FillRectangle(brush, X - 10, Y, label10.Width + 5, label10.Height);
+                brush = new SolidBrush(Color.Black);
+                e.Graphics.DrawRectangle(pen, 100, (Height - Height / 7) / 2,
+                    Width - (Width - label10.Location.X + 20) - 200, Height / 6);
+                e.Graphics.FillRectangle(brush, 100, (Height - Height / 7) / 2,
+                    Width - (Width - label10.Location.X + 20) - 200, Height / 6);
 
                 pen.Dispose();
                 brush.Dispose();
@@ -256,7 +263,7 @@ namespace StaniBogat
                 if (Controls[i].GetType() == typeof(System.Windows.Forms.Label))
                 {
                     Controls[i].ForeColor = Color.White;
-                    Controls[i].Font = new Font("Arial", Height / 36);
+                    Controls[i].Font = new Font("Arial", Height / 39);
                     Controls[i].BackColor = Color.Transparent;
                     Controls[i].Location = new System.Drawing.Point(
                         Width - (Controls[i].Width + 50), Y);
@@ -273,7 +280,7 @@ namespace StaniBogat
             button4.ForeColor = Color.White;
             button4.BackColor = Color.DarkBlue;
             button4.Font = new Font("Arial", Height / 43);
-            button4.Location = new System.Drawing.Point(label10.Location.X + 10, Height / 43);
+            button4.Location = new System.Drawing.Point(label10.Location.X, Height / 43);
 
             button3.Text = "Bonus\nTime";
             button3.ForeColor = Color.White;
@@ -288,7 +295,7 @@ namespace StaniBogat
             button2.BackColor = Color.DarkGoldenrod;
             button2.Height += Height / 86;
             button2.Location = new System.Drawing.Point(X + (label1.Width - button2.Width) / 2,
-                label1.Location.Y + label1.Height + Height / 59);
+                label1.Location.Y + label1.Height + Height / 30);
 
             button5.Text = "Best\nplayers";
             button5.ForeColor = Color.White;
@@ -297,6 +304,43 @@ namespace StaniBogat
             button5.Width += 5;
             button5.Height += 15;
             button5.Location = new System.Drawing.Point(10, 10);
+
+            button6.Text = "A - ";
+            button6.BackColor = Color.Black;
+            button6.ForeColor = Color.White;
+            button6.Font = new Font("Arial", 16);
+            button6.TextAlign = ContentAlignment.MiddleLeft;
+            button6.Size = new System.Drawing.Size((Width - (Width
+                - label10.Location.X + 20) - 200) / 2 - 10, Height / 9);
+            button6.Location = new System.Drawing.Point(100,
+                (Height - Height / 6) / 2 + Height / 6 + Height / 30);
+
+            button7.Text = "Б - ";
+            button7.BackColor = Color.Black;
+            button7.ForeColor = Color.White;
+            button7.Font = new Font("Arial", 16);
+            button7.TextAlign = ContentAlignment.MiddleLeft;
+            button7.Size = button6.Size;
+            button7.Location = new System.Drawing.Point(100 + button6.Width +
+                20, (Height - Height / 6) / 2 + Height / 6 + Height / 30);
+
+            button8.Text = "В - ";
+            button8.BackColor = Color.Black;
+            button8.ForeColor = Color.White;
+            button8.Font = new Font("Arial", 16);
+            button8.TextAlign = ContentAlignment.MiddleLeft;
+            button8.Size = button6.Size;
+            button8.Location = new System.Drawing.Point(100,
+                button6.Location.Y + button6.Height + 20);
+
+            button9.Text = "Г - ";
+            button9.BackColor = Color.Black;
+            button9.ForeColor = Color.White;
+            button9.Font = new Font("Arial", 16);
+            button9.TextAlign = ContentAlignment.MiddleLeft;
+            button9.Size = button6.Size;
+            button9.Location = new System.Drawing.Point(100 +
+                button8.Width + 20, button7.Location.Y + button7.Height + 20);
 
             Refresh();
         }
