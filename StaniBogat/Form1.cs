@@ -69,8 +69,8 @@ namespace StaniBogat
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.Width = (int)(Screen.PrimaryScreen.Bounds.Width / 1.20);
-            this.Height = (int)(Screen.PrimaryScreen.Bounds.Height / 1.20);
+            this.Width = Screen.PrimaryScreen.Bounds.Width;
+            this.Height = Screen.PrimaryScreen.Bounds.Height;
 
             for (int i = 0; i < Controls.Count; i++)
             {
@@ -96,7 +96,7 @@ namespace StaniBogat
             Element.Child = AnimationText;
             Element.Dock = DockStyle.Top;
 
-            AnimationText.FontSize = 42;
+            AnimationText.FontSize = 50;
             AnimationText.FontStyle = FontStyles.Italic;
             AnimationText.TextAlignment = TextAlignment.Center;
             AnimationText.VerticalAlignment = VerticalAlignment.Center;
@@ -116,7 +116,22 @@ namespace StaniBogat
 
             if (Time <= 0)
             {
-                timer1.Stop();
+                string win;
+
+                if (Controls[Count] == label1)
+                {
+                    win = "0";
+                }
+                else
+                {
+                    var sum = Controls[++Count].Text.Split(' ');
+                    win = sum[sum.Length - 3] + sum[sum.Length - 2] + sum[sum.Length - 1];
+                }
+
+                System.Windows.Forms.MessageBox.Show($"Sorry! " +
+                    $"Answer time is over!\n Your win is {win} GBP !");
+
+                FinishTheGame();
             }
 
             if (Time == 180)
@@ -199,6 +214,7 @@ namespace StaniBogat
 
                 e.Graphics.DrawImage(BackScene, 0, 0, Width, Height);
                 e.Graphics.DrawRectangle(pen, 10, 10, button5.Width, button5.Height);
+                e.Graphics.DrawRectangle(pen, button10.Location.X, 10, button10.Width, button10.Height);
                 e.Graphics.DrawRectangle(pen, label10.Location.X 
                     - 20, 4, Width - label10.Location.X - 2, Height - 55);
                 e.Graphics.FillRectangle(brush, label10.Location.X 
@@ -236,7 +252,7 @@ namespace StaniBogat
                     }
 
                     var text = Question.question.Insert(idx, "\n");
-                    e.Graphics.DrawString(text, new Font("Arial", Height / 52),
+                    e.Graphics.DrawString(text, new Font("Arial", Height / 57),
                     brush, 120, (Height - Height / 7) / 2 + 20);
 
                 }
@@ -301,7 +317,7 @@ namespace StaniBogat
             Controls.Remove(Element);
             Controls.Remove(button1);
             Player.Name = PlayerName.Text;
-            Y = Height / 7;
+            Y = Height / 7 + 20;
 
             for (int i = 0; i < Controls.Count; i++)
             {
@@ -354,7 +370,7 @@ namespace StaniBogat
             button6.Text = "А - ";
             button6.BackColor = Color.Black;
             button6.ForeColor = Color.White;
-            button6.Font = new Font("Arial", Height / 57);
+            button6.Font = new Font("Arial", Height / 59);
             button6.TextAlign = ContentAlignment.MiddleLeft;
             button6.Size = new System.Drawing.Size((Width - (Width
                 - label10.Location.X + 20) - 200) / 2 - 10, Height / 9);
@@ -364,7 +380,7 @@ namespace StaniBogat
             button7.Text = "Б - ";
             button7.BackColor = Color.Black;
             button7.ForeColor = Color.White;
-            button7.Font = new Font("Arial", Height / 57);
+            button7.Font = new Font("Arial", Height / 59);
             button7.TextAlign = ContentAlignment.MiddleLeft;
             button7.Size = button6.Size;
             button7.Location = new System.Drawing.Point(100 + button6.Width +
@@ -373,7 +389,7 @@ namespace StaniBogat
             button8.Text = "В - ";
             button8.BackColor = Color.Black;
             button8.ForeColor = Color.White;
-            button8.Font = new Font("Arial", Height / 57);
+            button8.Font = new Font("Arial", Height / 59);
             button8.TextAlign = ContentAlignment.MiddleLeft;
             button8.Size = button6.Size;
             button8.Location = new System.Drawing.Point(100,
@@ -382,11 +398,18 @@ namespace StaniBogat
             button9.Text = "Г - ";
             button9.BackColor = Color.Black;
             button9.ForeColor = Color.White;
-            button9.Font = new Font("Arial", Height / 57);
+            button9.Font = new Font("Arial", Height / 59);
             button9.TextAlign = ContentAlignment.MiddleLeft;
             button9.Size = button6.Size;
             button9.Location = new System.Drawing.Point(100 +
                 button8.Width + 20, button7.Location.Y + button7.Height + 20);
+
+            button10.Size = button5.Size;
+            button10.ForeColor = Color.White;
+            button10.BackColor = Color.Black;
+            button10.Font = new Font("Arial", Height / 54);
+            button10.Location = new System.Drawing.Point(
+                label10.Location.X - 50 - button10.Width, 10);
 
             SelectQuestion();
             Refresh();
@@ -394,8 +417,22 @@ namespace StaniBogat
 
         private void button2_Click(object sender, EventArgs e)
         {
-            timer1.Stop();
-            System.Windows.MessageBox.Show("Congratulations!\nYour game finished!");
+            string win;
+
+            if (Controls[Count] == label1)
+            {
+                win = "0";
+            }
+            else
+            {
+                var sum = Controls[++Count].Text.Split(' ');
+                win = sum[sum.Length - 3] + sum[sum.Length - 2] + sum[sum.Length - 1];
+            }
+
+            System.Windows.Forms.MessageBox.Show($"Congratulations," +
+                $" the game is finished! \nYour win is {win} GBP !");
+
+            FinishTheGame();
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -612,19 +649,26 @@ namespace StaniBogat
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            string messageBoxText = "If you close the game, " +
-                "\nall progress will be lost!";
-            string caption = "Closing the game!";
-            MessageBoxImage icon = MessageBoxImage.Warning;
-            MessageBoxButton button = MessageBoxButton.OKCancel;
-
-            MessageBoxResult result;
-            result = System.Windows.MessageBox.Show(messageBoxText,
-                caption, button, icon, MessageBoxResult.Yes);
-
-            if (result != MessageBoxResult.OK)
+            if (IsStarted == true)
             {
-                e.Cancel = true;
+                string messageBoxText = "If you close the game, " +
+                "\nall progress will be lost!";
+                string caption = "Closing the game!";
+                MessageBoxImage icon = MessageBoxImage.Warning;
+                MessageBoxButton button = MessageBoxButton.OKCancel;
+
+                MessageBoxResult result;
+                result = System.Windows.MessageBox.Show(messageBoxText,
+                    caption, button, icon, MessageBoxResult.Yes);
+
+                if (result != MessageBoxResult.OK)
+                {
+                    e.Cancel = true;
+                }
+            }
+            else
+            {
+                Close();
             }
         }
 
@@ -736,9 +780,20 @@ namespace StaniBogat
                 }
                 else
                 {
-                    RestartTheGame();
-                    var sum = Controls[Count].Text.Split(' ');
-                    var win = sum[sum.Length - 3] + sum[sum.Length - 2] + sum[sum.Length - 1];
+                    FinishTheGame();
+
+                    var win = "";
+
+                    if (Controls[Count] == label1)
+                    {
+                        win = "0";
+                    }
+                    else
+                    {
+                        var sum = Controls[++Count].Text.Split(' ');
+                        win = sum[sum.Length - 3] + sum[sum.Length - 2] + sum[sum.Length - 1];
+                    }
+
                     System.Windows.Forms.MessageBox.Show($"Wrong answer!\n" +
                         $" Your win is {win} GBP !");
                 }             
@@ -747,17 +802,65 @@ namespace StaniBogat
             Refresh();
         }
 
-        private void RestartTheGame()
+        private void FinishTheGame()
         {
             timer1.Stop();
             Question.question = "";
 
             for (int i = 0; i < Controls.Count; i++)
             {
+                if (Controls[i] == button10)
+                {
+                    continue;
+                }
+                else if (i == Count)
+                {
+                    Controls[i].ForeColor = Color.White;
+                    Controls[i].BackColor = Color.Transparent;
+                }
+
                 Controls[i].Enabled = false;
             }
 
             Refresh();
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            MessageBoxResult result;
+            string caption = "Start new game!";
+            MessageBoxImage icon = MessageBoxImage.Question;
+            MessageBoxButton button = MessageBoxButton.YesNo;
+            string messageBoxText = "Do you want to start new game?";
+
+            result = System.Windows.MessageBox.Show(messageBoxText,
+                caption, button, icon, MessageBoxResult.Yes);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Level = 0;
+                Time = 120;
+                timer1.Start();
+                WaitSeconds = 3;
+                IsUsedBtn1 = false;
+                IsUsedBtn2 = false;
+                IsFinished = false;
+                IsClickedBtn6 = false;
+                IsClickedBtn7 = false;
+                IsClickedBtn8 = false;
+                IsClickedBtn9 = false;
+                label1.ForeColor = Color.Black;
+                label1.BackColor = Color.DarkGoldenrod;
+                Count = Controls.GetChildIndex(label1);
+
+                for (int i = 0; i < Controls.Count; i++)
+                {
+                    Controls[i].Enabled = true;
+                }
+
+                SelectQuestion();
+                Refresh();
+            }
         }
     }
 }
