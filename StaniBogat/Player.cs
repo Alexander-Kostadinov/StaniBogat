@@ -8,7 +8,7 @@ namespace StaniBogat
 {
     public class Player
     {
-        public int Win {  get; set; }
+        public int Win { get; set; }
 
         public string Name { get; set; }
 

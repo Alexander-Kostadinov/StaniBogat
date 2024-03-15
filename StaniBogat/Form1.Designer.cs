@@ -64,7 +64,7 @@
             this.button1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button1.Image = global::StaniBogat.Properties.Resources.start_button;
-            this.button1.Location = new System.Drawing.Point(334, 39);
+            this.button1.Location = new System.Drawing.Point(334, 149);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(229, 85);
             this.button1.TabIndex = 1;
@@ -209,6 +209,7 @@
             this.button5.TabIndex = 15;
             this.button5.Text = "Best Players";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button6
             // 

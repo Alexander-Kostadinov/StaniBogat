@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Forms.Integration;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StaniBogat
 {
@@ -19,9 +20,10 @@ namespace StaniBogat
         public int Time;
         public int Level;
         public int Count;
-        public Form Form;
+        public Form PlayerNameForm;
         public bool LoadGif;
         public Player Player;
+        public int PlayedTime;
         public bool IsStarted;
         public bool IsFinished;
         public bool IsUsedBtn1;
@@ -45,9 +47,9 @@ namespace StaniBogat
 
             Level = 0;
             Time = 120;
+            PlayedTime = 0;
             WaitSeconds = 3;
             LoadGif = false;
-            Form = new Form();
             IsStarted = false;
             IsFinished = false;
             TimeText = "02:00";
@@ -57,6 +59,7 @@ namespace StaniBogat
             timer1.Interval = 1000;
             timer2.Interval = 1000;
             Question = new Question();
+            PlayerNameForm = new Form();
             Element = new ElementHost();
             AnimationText = new TextBlock();
             Count = Controls.GetChildIndex(label1);
@@ -113,25 +116,13 @@ namespace StaniBogat
         private void timer1_Tick(object sender, EventArgs e)
         {
             Time--;
+            PlayedTime++;
 
             if (Time <= 0)
             {
-                string win;
-
-                if (Controls[Count] == label1)
-                {
-                    win = "0";
-                }
-                else
-                {
-                    var sum = Controls[++Count].Text.Split(' ');
-                    win = sum[sum.Length - 3] + sum[sum.Length - 2] + sum[sum.Length - 1];
-                }
-
-                System.Windows.Forms.MessageBox.Show($"Sorry! " +
-                    $"Answer time is over!\n Your win is {win} GBP !");
-
+                TimeText = "00:00";
                 FinishTheGame();
+                return;
             }
 
             if (Time == 180)
@@ -200,7 +191,7 @@ namespace StaniBogat
                         gif = null;
                         Element.Dispose();
                         Controls.Remove(Element);
-                        Form.Show();
+                        PlayerNameForm.Show();
                     };
                     gif.Play();
                 }
@@ -234,33 +225,9 @@ namespace StaniBogat
                 e.Graphics.FillRectangle(brush, 100, (Height - Height / 7) / 2,
                     Width - (Width - label10.Location.X + 20) - 200, Height / 6);
                 brush = new SolidBrush(Color.White);
-
-                if (Question.question.Length * (Height / 50) + 100 > label10.Location.X - 20)
-                {
-                    int idx = Question.question.Length / 2;
-
-                    if (Question.question[idx] != ' ')
-                    {
-                        for (int i = idx; i < Question.question.Length; i++)
-                        {
-                            if (Question.question[i] == ' ')
-                            {
-                                idx = i;
-                                break;
-                            }
-                        }
-                    }
-
-                    var text = Question.question.Insert(idx, "\n");
-                    e.Graphics.DrawString(text, new Font("Arial", Height / 57),
-                    brush, 120, (Height - Height / 7) / 2 + 20);
-
-                }
-                else
-                {
-                    e.Graphics.DrawString(Question.question, new Font("Arial", Height / 52),
-                    brush, 120, (Height - Height / 7) / 2 + 20);
-                }     
+                e.Graphics.DrawString(FormatText(Question.question),
+                    new Font("Arial", Height / 65), brush, new System.Drawing.Point(
+                        120, (Height - Height / 7) / 2 + 20));
 
                 pen.Dispose();
                 brush.Dispose();
@@ -273,29 +240,32 @@ namespace StaniBogat
             Controls.Remove(button1);
             Controls.Remove(Element);
 
-            Form.Size = new System.Drawing.Size(550, 375);
-            Form.Controls.Add(PlayerName);
+            PlayerNameForm.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            PlayerNameForm.MaximizeBox = false;
+            PlayerNameForm.MinimizeBox = false;
+            PlayerNameForm.Size = new System.Drawing.Size(550, 375);
+            PlayerNameForm.Controls.Add(PlayerName);
             PlayerName.Font = new Font("Italic", 14);
-            PlayerName.Width = Form.Width / 2;
-            Form.StartPosition = FormStartPosition.CenterScreen;
-            PlayerName.Location = new System.Drawing.Point((Form.Width
-                - PlayerName.Width) / 2, (Form.Height - PlayerName.Height) / 2 - 25);
+            PlayerName.Width = PlayerNameForm.Width / 2;
+            PlayerNameForm.StartPosition = FormStartPosition.CenterScreen;
+            PlayerName.Location = new System.Drawing.Point((PlayerNameForm.Width
+                - PlayerName.Width) / 2, (PlayerNameForm.Height - PlayerName.Height) / 2 - 25);
 
             System.Windows.Forms.Button button = new System.Windows.Forms.Button();
-            Form.Controls.Add(button);
+            PlayerNameForm.Controls.Add(button);
             button.Click += Button_Click;
             button.Size = new System.Drawing.Size(200, 75);
             button.Font = new Font("Arial", 20);
             button.Text = "Start";
-            button.Location = new System.Drawing.Point((Form.Width
+            button.Location = new System.Drawing.Point((PlayerNameForm.Width
                 - button.Width) / 2, PlayerName.Location.Y + PlayerName.Height + 20);
 
             var label = new System.Windows.Forms.Label();
-            Form.Controls.Add(label);
+            PlayerNameForm.Controls.Add(label);
             label.AutoSize = true;
             label.Font = new Font("Italic", 24);
             label.Text = "Please, enter player name!";
-            label.Location = new System.Drawing.Point((Form.Width - label.Width) / 2, 80);
+            label.Location = new System.Drawing.Point((PlayerNameForm.Width - label.Width) / 2, 80);
 
             LoadGif = true;
             Refresh();
@@ -310,14 +280,15 @@ namespace StaniBogat
                 return;
             }
 
-            Form.Close();
-            Form.Dispose();
+            Player.Name = PlayerName.Text;
+
+            PlayerNameForm.Close();
+            PlayerNameForm.Dispose();
             timer1.Start();
             IsStarted = true;
             Controls.Remove(Element);
             Controls.Remove(button1);
-            Player.Name = PlayerName.Text;
-            Y = Height / 7 + 20;
+            Y = Height / 7 + Height / 43;
 
             for (int i = 0; i < Controls.Count; i++)
             {
@@ -370,7 +341,7 @@ namespace StaniBogat
             button6.Text = "А - ";
             button6.BackColor = Color.Black;
             button6.ForeColor = Color.White;
-            button6.Font = new Font("Arial", Height / 59);
+            button6.Font = new Font("Arial", Height / 70);
             button6.TextAlign = ContentAlignment.MiddleLeft;
             button6.Size = new System.Drawing.Size((Width - (Width
                 - label10.Location.X + 20) - 200) / 2 - 10, Height / 9);
@@ -380,7 +351,7 @@ namespace StaniBogat
             button7.Text = "Б - ";
             button7.BackColor = Color.Black;
             button7.ForeColor = Color.White;
-            button7.Font = new Font("Arial", Height / 59);
+            button7.Font = new Font("Arial", Height / 70);
             button7.TextAlign = ContentAlignment.MiddleLeft;
             button7.Size = button6.Size;
             button7.Location = new System.Drawing.Point(100 + button6.Width +
@@ -389,7 +360,7 @@ namespace StaniBogat
             button8.Text = "В - ";
             button8.BackColor = Color.Black;
             button8.ForeColor = Color.White;
-            button8.Font = new Font("Arial", Height / 59);
+            button8.Font = new Font("Arial", Height / 70);
             button8.TextAlign = ContentAlignment.MiddleLeft;
             button8.Size = button6.Size;
             button8.Location = new System.Drawing.Point(100,
@@ -398,7 +369,7 @@ namespace StaniBogat
             button9.Text = "Г - ";
             button9.BackColor = Color.Black;
             button9.ForeColor = Color.White;
-            button9.Font = new Font("Arial", Height / 59);
+            button9.Font = new Font("Arial", Height / 70);
             button9.TextAlign = ContentAlignment.MiddleLeft;
             button9.Size = button6.Size;
             button9.Location = new System.Drawing.Point(100 +
@@ -417,22 +388,26 @@ namespace StaniBogat
 
         private void button2_Click(object sender, EventArgs e)
         {
-            string win;
+            string messageBoxText = "Are you sure you want to end the game?";
+            string caption = "Surrender!";
+            MessageBoxImage icon = MessageBoxImage.Question;
+            MessageBoxButton button = MessageBoxButton.YesNo;
 
-            if (Controls[Count] == label1)
+            MessageBoxResult result;
+            result = System.Windows.MessageBox.Show(messageBoxText,
+                caption, button, icon, MessageBoxResult.Yes);
+
+            if (result == MessageBoxResult.Yes)
             {
-                win = "0";
-            }
-            else
-            {
-                var sum = Controls[++Count].Text.Split(' ');
-                win = sum[sum.Length - 3] + sum[sum.Length - 2] + sum[sum.Length - 1];
+                timer1.Stop();
+                timer2.Stop();
+                WaitSeconds = 3;
+                Controls[Count].ForeColor = Color.White;
+                Controls[Count].BackColor = Color.Transparent;
+                FinishTheGame();
             }
 
-            System.Windows.Forms.MessageBox.Show($"Congratulations," +
-                $" the game is finished! \nYour win is {win} GBP !");
-
-            FinishTheGame();
+            Refresh();
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -521,6 +496,7 @@ namespace StaniBogat
         {
             if (Level > 9)
             {
+                FinishTheGame();
                 return;
             }
 
@@ -528,11 +504,12 @@ namespace StaniBogat
             var text = File.ReadAllText(path);
 
             var questionLevels = JArray.Parse(text);
-            var questions = questionLevels[Level].ToString();
+            var questions = questionLevels[6].ToString();
             var questionLevel = JsonConvert.DeserializeObject<QuestionLevel>(questions);
 
             Random random = new Random();
-            Question = questionLevel.questions[random.Next(0, questionLevel.questions.Count - 1)];
+            Question = questionLevel.questions[4];
+            //random.Next(0, questionLevel.questions.Count - 1)
 
             var num = random.Next(1, 4);
 
@@ -568,11 +545,6 @@ namespace StaniBogat
 
         private void button6_Click(object sender, EventArgs e)
         {
-            if (Level > 9)
-            {
-                return;
-            }
-
             timer1.Stop();
             timer2.Start();
             IsClickedBtn6 = true;
@@ -584,11 +556,6 @@ namespace StaniBogat
 
         private void button7_Click(object sender, EventArgs e)
         {
-            if (Level > 9)
-            {
-                return;
-            }
-
             timer1.Stop();
             timer2.Start();
             IsClickedBtn7 = true;
@@ -600,11 +567,6 @@ namespace StaniBogat
 
         private void button8_Click(object sender, EventArgs e)
         {
-            if (Level > 9)
-            {
-                return;
-            }
-
             timer1.Stop();
             timer2.Start();
             IsClickedBtn8 = true;
@@ -616,11 +578,6 @@ namespace StaniBogat
 
         private void button9_Click(object sender, EventArgs e)
         {
-            if (Level > 9)
-            {
-                return;
-            }
-
             timer1.Stop();
             timer2.Start();
             IsClickedBtn9 = true;
@@ -645,30 +602,24 @@ namespace StaniBogat
             button8.BackColor = Color.Black;
             button9.ForeColor = Color.White;
             button9.BackColor = Color.Black;
+
+            Refresh();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (IsStarted == true)
-            {
-                string messageBoxText = "If you close the game, " +
-                "\nall progress will be lost!";
-                string caption = "Closing the game!";
-                MessageBoxImage icon = MessageBoxImage.Warning;
-                MessageBoxButton button = MessageBoxButton.OKCancel;
+            string messageBoxText = "Do you really want to close the game?";
+            string caption = "Closing the game!";
+            MessageBoxImage icon = MessageBoxImage.Question;
+            MessageBoxButton button = MessageBoxButton.YesNo;
 
-                MessageBoxResult result;
-                result = System.Windows.MessageBox.Show(messageBoxText,
-                    caption, button, icon, MessageBoxResult.Yes);
+            MessageBoxResult result;
+            result = System.Windows.MessageBox.Show(messageBoxText,
+                caption, button, icon, MessageBoxResult.Yes);
 
-                if (result != MessageBoxResult.OK)
-                {
-                    e.Cancel = true;
-                }
-            }
-            else
+            if (result != MessageBoxResult.Yes)
             {
-                Close();
+                e.Cancel = true;
             }
         }
 
@@ -699,8 +650,6 @@ namespace StaniBogat
                         button6.BackColor = Color.Red;
                         button6.ForeColor = Color.Black;
                     }
-
-                    Refresh();
                 }
                 else if (IsClickedBtn7)
                 {
@@ -720,8 +669,6 @@ namespace StaniBogat
                         button7.BackColor = Color.Red;
                         button7.ForeColor = Color.Black;
                     }
-
-                    Refresh();
                 }
                 else if (IsClickedBtn8)
                 {
@@ -741,8 +688,6 @@ namespace StaniBogat
                         button8.BackColor = Color.Red;
                         button8.ForeColor = Color.Black;
                     }
-
-                    Refresh();
                 }
                 else if (IsClickedBtn9)
                 {
@@ -762,8 +707,6 @@ namespace StaniBogat
                         button9.BackColor = Color.Red;
                         button9.ForeColor = Color.Black;
                     }
-
-                    Refresh();
                 }
             }
             else if (WaitSeconds == 0)
@@ -781,21 +724,6 @@ namespace StaniBogat
                 else
                 {
                     FinishTheGame();
-
-                    var win = "";
-
-                    if (Controls[Count] == label1)
-                    {
-                        win = "0";
-                    }
-                    else
-                    {
-                        var sum = Controls[++Count].Text.Split(' ');
-                        win = sum[sum.Length - 3] + sum[sum.Length - 2] + sum[sum.Length - 1];
-                    }
-
-                    System.Windows.Forms.MessageBox.Show($"Wrong answer!\n" +
-                        $" Your win is {win} GBP !");
                 }             
             }
 
@@ -805,24 +733,52 @@ namespace StaniBogat
         private void FinishTheGame()
         {
             timer1.Stop();
+            TimeText = "";
+            ClearAnswerButtons();
             Question.question = "";
+            Player.PlayedTime = PlayedTime;
+
+            if (Controls[Count] != button2)
+            {
+                Controls[Count].ForeColor = Color.White;
+                Controls[Count].BackColor = Color.Transparent;
+            }
+
+            Refresh();
 
             for (int i = 0; i < Controls.Count; i++)
             {
-                if (Controls[i] == button10)
+                if (Controls[i] == button10 ||
+                    Controls[i] == button5)
                 {
                     continue;
-                }
-                else if (i == Count)
-                {
-                    Controls[i].ForeColor = Color.White;
-                    Controls[i].BackColor = Color.Transparent;
                 }
 
                 Controls[i].Enabled = false;
             }
 
-            Refresh();
+            if (Controls[Count] == label1)
+            { 
+                Player.Win = 0;
+            }
+            else if (Level < 9)
+            {
+                var sum = Controls[++Count].Text.Split(' ');
+                Player.Win = int.Parse(sum[sum.Length - 3] +
+                    sum[sum.Length - 2] + sum[sum.Length - 1]);
+
+                System.Windows.Forms.MessageBox.Show(
+                $"The game is over!\n Your win is {Player.Win} GBP !");
+            }
+            else
+            {
+                Player.Win = 1000000;
+                System.Windows.Forms.MessageBox.Show(
+                $"Congratulations!\n You answered 10 " +
+                $"questions and you win 1 000 000 GBP !");
+            }
+
+            CheckLeaderboard();
         }
 
         private void button10_Click(object sender, EventArgs e)
@@ -849,6 +805,9 @@ namespace StaniBogat
                 IsClickedBtn7 = false;
                 IsClickedBtn8 = false;
                 IsClickedBtn9 = false;
+                var name = Player.Name;
+                Player = new Player();
+                Player.Name = name;
                 label1.ForeColor = Color.Black;
                 label1.BackColor = Color.DarkGoldenrod;
                 Count = Controls.GetChildIndex(label1);
@@ -859,8 +818,108 @@ namespace StaniBogat
                 }
 
                 SelectQuestion();
-                Refresh();
             }
+
+            Refresh();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            var file = Directory.Replace("bin", "") + "Leaderboard.txt";
+            var content = File.ReadAllText(file);
+
+            if (content != "")
+            {
+                var result = "";
+                List<Player> players = JsonConvert.DeserializeObject<List<Player>>(content);
+                var rank = players.OrderByDescending(p => p.Win).ThenBy(p => p.PlayedTime).ToList();
+
+                if (rank.Count > 0)
+                {
+                    for (int i = 0; i < players.Count; i++)
+                    {
+                        TimeSpan t = TimeSpan.FromSeconds(rank[i].PlayedTime);
+                        string time = string.Format("{0:D2}:{1:D2}",
+                            t.Minutes,
+                            t.Seconds);
+
+                        result += (i + 1).ToString() + '.' + ' ' + "Player name: " + rank[i].Name
+                            + $" Win: {rank[i].Win} Played time: {time}" + '\n';
+                    }
+                }
+
+                System.Windows.Forms.MessageBox.Show(result);
+            }
+        }
+
+        private void CheckLeaderboard()
+        {
+            var file = Directory.Replace("bin", "") + "Leaderboard.txt";
+            var content = File.ReadAllText(file);
+            var players = JsonConvert.DeserializeObject<List<Player>>(content)
+                .OrderByDescending(p => p.Win).ThenBy(p => p.PlayedTime).ToList();
+
+            if (players.Count == 0)
+            {
+                players.Add(Player);
+            }
+            else
+            {
+                var names = players.Select(p => p.Name).ToList();
+
+                if (names.Contains(Player.Name))
+                {
+                    Player player = players.Where(p => p.Name == Player.Name).FirstOrDefault();
+
+                    if ((Player.Win == player.Win && Player.PlayedTime
+                        < player.PlayedTime) || Player.Win > player.Win)
+                    {
+                        players.Remove(player);
+                        players.Add(Player);
+                    }
+                }
+                else if (Player.Win > players.Last().Win ||
+                    (Player.Win == players.Last().Win &&
+                    Player.PlayedTime < players.Last().PlayedTime))
+                {
+                    players.RemoveAt(players.Count - 1);
+                    players.Add(Player);
+                }
+            }
+
+            var rankList = players.OrderByDescending(p =>
+                p.Win).ThenBy(p => p.PlayedTime).ToList();
+            File.WriteAllText(file, JsonConvert.SerializeObject(rankList));
+        }
+
+        private string FormatText(string text)
+        {
+            if (text == null)
+            {
+                return null;
+            }
+
+            var chars = text.ToCharArray();
+
+            int i;
+            int j = 0;
+
+            for (i = 0; i < chars.Length; i++)
+            {
+                if ((i - j) * (Height / 65) + 100 >= label10.Location.X - 20)
+                {
+                    for (j = i; j > 0; j--)
+                    {
+                        if (chars[j] == ' ')
+                        {
+                            chars[j] = '\n';
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return new string(chars);
         }
     }
 }
