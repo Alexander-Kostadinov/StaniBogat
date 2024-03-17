@@ -46,13 +46,13 @@ namespace StaniBogat
             InitializeComponent();
 
             Level = 0;
-            Time = 120;
+            Time = 60;
             PlayedTime = 0;
             WaitSeconds = 3;
             LoadGif = false;
             IsStarted = false;
             IsFinished = false;
-            TimeText = "02:00";
+            TimeText = "01:00";
             IsUsedBtn1 = false;
             IsUsedBtn2 = false;
             Player = new Player();
@@ -115,30 +115,14 @@ namespace StaniBogat
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Time--;
-            PlayedTime++;
-
             if (Time <= 0)
             {
-                TimeText = "00:00";
                 FinishTheGame();
                 return;
             }
-
-            if (Time == 180)
+            else if (Time == 120)
             {
-                TimeText = "03:00";
-            }
-            else if (Time >= 120 && Time < 180)
-            {
-                if (Time < 130)
-                {
-                    TimeText = "02:" + '0' + (Time - 120);
-                }
-                else
-                {
-                    TimeText = "02:" + (Time - 120);
-                }
+                TimeText = "02:00";
             }
             else if (Time < 120 && Time >= 60)
             {
@@ -162,6 +146,9 @@ namespace StaniBogat
                     TimeText = "00:" + Time;
                 }
             }
+
+            Time--;
+            PlayedTime++;
 
             Refresh();
         }
@@ -220,14 +207,14 @@ namespace StaniBogat
                 e.Graphics.DrawString(TimeText, new Font("Arial", Height / 27),
                     brush, new PointF(((label10.Location.X - 20) / 2) - TimeText.Length * (Height / 29) / 2, 25));
                 brush = new SolidBrush(Color.Black);
-                e.Graphics.DrawRectangle(pen, 100, (Height - Height / 7) / 2,
-                    Width - (Width - label10.Location.X + 20) - 200, Height / 6);
-                e.Graphics.FillRectangle(brush, 100, (Height - Height / 7) / 2,
-                    Width - (Width - label10.Location.X + 20) - 200, Height / 6);
+                e.Graphics.DrawRectangle(pen, 75, (Height - Height / 7 - 50) / 2,
+                    Width - (Width - label10.Location.X + 20) - 150, Height / 6 + 50);
+                e.Graphics.FillRectangle(brush, 75, (Height - Height / 7 - 50) / 2,
+                    Width - (Width - label10.Location.X + 20) - 150, Height / 6 + 50);
                 brush = new SolidBrush(Color.White);
                 e.Graphics.DrawString(FormatText(Question.question),
                     new Font("Arial", Height / 65), brush, new System.Drawing.Point(
-                        120, (Height - Height / 7) / 2 + 20));
+                        90, (Height - Height / 7 - 35) / 2));
 
                 pen.Dispose();
                 brush.Dispose();
@@ -344,9 +331,9 @@ namespace StaniBogat
             button6.Font = new Font("Arial", Height / 70);
             button6.TextAlign = ContentAlignment.MiddleLeft;
             button6.Size = new System.Drawing.Size((Width - (Width
-                - label10.Location.X + 20) - 200) / 2 - 10, Height / 9);
-            button6.Location = new System.Drawing.Point(100,
-                (Height - Height / 6) / 2 + Height / 6 + Height / 30);
+                - label10.Location.X + 20) - 170) / 2, Height / 7);
+            button6.Location = new System.Drawing.Point(75,
+                (Height - Height / 6) / 2 + Height / 7 + Height / 12);
 
             button7.Text = "Б - ";
             button7.BackColor = Color.Black;
@@ -354,8 +341,8 @@ namespace StaniBogat
             button7.Font = new Font("Arial", Height / 70);
             button7.TextAlign = ContentAlignment.MiddleLeft;
             button7.Size = button6.Size;
-            button7.Location = new System.Drawing.Point(100 + button6.Width +
-                20, (Height - Height / 6) / 2 + Height / 6 + Height / 30);
+            button7.Location = new System.Drawing.Point(75 + button6.Width +
+                20, (Height - Height / 6) / 2 + Height / 7 + Height / 12);
 
             button8.Text = "В - ";
             button8.BackColor = Color.Black;
@@ -363,7 +350,7 @@ namespace StaniBogat
             button8.Font = new Font("Arial", Height / 70);
             button8.TextAlign = ContentAlignment.MiddleLeft;
             button8.Size = button6.Size;
-            button8.Location = new System.Drawing.Point(100,
+            button8.Location = new System.Drawing.Point(75,
                 button6.Location.Y + button6.Height + 20);
 
             button9.Text = "Г - ";
@@ -372,7 +359,7 @@ namespace StaniBogat
             button9.Font = new Font("Arial", Height / 70);
             button9.TextAlign = ContentAlignment.MiddleLeft;
             button9.Size = button6.Size;
-            button9.Location = new System.Drawing.Point(100 +
+            button9.Location = new System.Drawing.Point(75 +
                 button8.Width + 20, button7.Location.Y + button7.Height + 20);
 
             button10.Size = button5.Size;
@@ -504,12 +491,11 @@ namespace StaniBogat
             var text = File.ReadAllText(path);
 
             var questionLevels = JArray.Parse(text);
-            var questions = questionLevels[6].ToString();
+            var questions = questionLevels[Level].ToString();
             var questionLevel = JsonConvert.DeserializeObject<QuestionLevel>(questions);
 
             Random random = new Random();
-            Question = questionLevel.questions[4];
-            //random.Next(0, questionLevel.questions.Count - 1)
+            Question = questionLevel.questions[random.Next(0, questionLevel.questions.Count - 1)];
 
             var num = random.Next(1, 4);
 
@@ -642,7 +628,7 @@ namespace StaniBogat
                         button6.ForeColor = Color.Black;
                         Level++; Count--;
                         timer1.Start();
-                        Time = 120;
+                        Time = 60;
                     }
                     else
                     {
@@ -661,7 +647,7 @@ namespace StaniBogat
                         button7.ForeColor = Color.Black;
                         Level++; Count--;
                         timer1.Start();
-                        Time = 120;
+                        Time = 60;
                     }
                     else
                     {
@@ -680,7 +666,7 @@ namespace StaniBogat
                         button8.ForeColor = Color.Black;
                         Level++; Count--;
                         timer1.Start();
-                        Time = 120;
+                        Time = 60;
                     }
                     else
                     {
@@ -699,7 +685,7 @@ namespace StaniBogat
                         button9.ForeColor = Color.Black;
                         Level++; Count--;
                         timer1.Start();
-                        Time = 120;
+                        Time = 60;
                     }
                     else
                     {
@@ -733,7 +719,7 @@ namespace StaniBogat
         private void FinishTheGame()
         {
             timer1.Stop();
-            TimeText = "";
+            TimeText = "00:00";
             ClearAnswerButtons();
             Question.question = "";
             Player.PlayedTime = PlayedTime;
@@ -760,8 +746,10 @@ namespace StaniBogat
             if (Controls[Count] == label1)
             { 
                 Player.Win = 0;
+                System.Windows.Forms.MessageBox.Show(
+                $"The game is over!\n Your win is {Player.Win} GBP !");
             }
-            else if (Level < 9)
+            else if (Level <= 9)
             {
                 var sum = Controls[++Count].Text.Split(' ');
                 Player.Win = int.Parse(sum[sum.Length - 3] +
@@ -795,7 +783,7 @@ namespace StaniBogat
             if (result == MessageBoxResult.Yes)
             {
                 Level = 0;
-                Time = 120;
+                Time = 60;
                 timer1.Start();
                 WaitSeconds = 3;
                 IsUsedBtn1 = false;
@@ -856,10 +844,16 @@ namespace StaniBogat
         {
             var file = Directory.Replace("bin", "") + "Leaderboard.txt";
             var content = File.ReadAllText(file);
-            var players = JsonConvert.DeserializeObject<List<Player>>(content)
-                .OrderByDescending(p => p.Win).ThenBy(p => p.PlayedTime).ToList();
+            var players = new List<Player>();
 
-            if (players.Count == 0)
+            if (content != "")
+            {
+                players = JsonConvert.DeserializeObject<List<Player>>(content)
+                .OrderByDescending(p => p.Win).ThenBy(p => p.PlayedTime).ToList();
+            }
+
+            if (players.Count < 10 && !players.Select(p 
+                => p.Name).ToList().Contains(Player.Name))
             {
                 players.Add(Player);
             }
@@ -878,9 +872,8 @@ namespace StaniBogat
                         players.Add(Player);
                     }
                 }
-                else if (Player.Win > players.Last().Win ||
-                    (Player.Win == players.Last().Win &&
-                    Player.PlayedTime < players.Last().PlayedTime))
+                else if (Player.Win > players.Last().Win || (Player.Win == 
+                    players.Last().Win && Player.PlayedTime < players.Last().PlayedTime))
                 {
                     players.RemoveAt(players.Count - 1);
                     players.Add(Player);
