@@ -1,1 +1,1 @@
-[{"Win":1000000,"Name":"Sasho","PlayedTime":63},{"Win":20000,"Name":"Pesho","PlayedTime":58}]
+[{"Win":1000000,"Name":"test","PlayedTime":52},{"Win":1000000,"Name":"Pesho","PlayedTime":54},{"Win":1000000,"Name":"Sasho","PlayedTime":63},{"Win":1000000,"Name":"Asen","PlayedTime":115},{"Win":1000000,"Name":"Test","PlayedTime":237},{"Win":20000,"Name":"mirektr","PlayedTime":321},{"Win":5000,"Name":"qwerty","PlayedTime":113},{"Win":1000,"Name":"TEst","PlayedTime":73}]

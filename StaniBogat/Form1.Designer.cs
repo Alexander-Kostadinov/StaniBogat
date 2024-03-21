@@ -51,6 +51,7 @@
             this.button9 = new System.Windows.Forms.Button();
             this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.button10 = new System.Windows.Forms.Button();
+            this.button11 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // timer1
@@ -177,11 +178,11 @@
             // 
             this.button3.AutoSize = true;
             this.button3.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button3.Location = new System.Drawing.Point(855, 12);
+            this.button3.Location = new System.Drawing.Point(774, 9);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(89, 50);
             this.button3.TabIndex = 13;
-            this.button3.Text = "Bonus Time";
+            this.button3.Text = "Bonus time";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             this.button3.Paint += new System.Windows.Forms.PaintEventHandler(this.button3_Paint);
@@ -190,7 +191,7 @@
             // 
             this.button4.AutoSize = true;
             this.button4.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button4.Location = new System.Drawing.Point(776, 12);
+            this.button4.Location = new System.Drawing.Point(695, 10);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(73, 50);
             this.button4.TabIndex = 14;
@@ -257,13 +258,24 @@
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(628, 12);
+            this.button10.Location = new System.Drawing.Point(590, 10);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(75, 50);
             this.button10.TabIndex = 21;
-            this.button10.Text = "New Game";
+            this.button10.Text = "New game";
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
+            // button11
+            // 
+            this.button11.Location = new System.Drawing.Point(869, 9);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(75, 50);
+            this.button11.TabIndex = 22;
+            this.button11.Text = "Change question";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
+            this.button11.Paint += new System.Windows.Forms.PaintEventHandler(this.button11_Paint);
             // 
             // Form1
             // 
@@ -271,6 +283,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MidnightBlue;
             this.ClientSize = new System.Drawing.Size(956, 451);
+            this.Controls.Add(this.button11);
             this.Controls.Add(this.button10);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
@@ -297,7 +310,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultBounds;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -331,6 +344,7 @@
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Timer timer2;
         private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.Button button11;
     }
 }
 
